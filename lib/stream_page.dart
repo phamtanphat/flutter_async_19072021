@@ -22,14 +22,18 @@ class _StreamPageState extends State<StreamPage> {
     //   print(event);
     // });
 
-    var stream1 = Stream.periodic(Duration(seconds: 1) , (count) => count).asBroadcastStream();
+    var stream = Stream.periodic(Duration(seconds: 1) , (count) => count);
 
-    stream1.listen((event) {
-      print("Stream 1 " + event.toString());
+    var subscription = stream.listen((event) {
+      print(event);
     });
 
-    stream1.listen((event) {
-      print("Stream 2 " + event.toString());
+    Future.delayed(Duration(seconds: 5) , () => {
+      subscription.pause()
+    });
+
+    Future.delayed(Duration(seconds: 10) , () => {
+      subscription.resume()
     });
   }
   

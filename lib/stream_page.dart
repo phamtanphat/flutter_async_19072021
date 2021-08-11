@@ -1,4 +1,6 @@
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 class StreamPage extends StatefulWidget {
 
@@ -22,19 +24,38 @@ class _StreamPageState extends State<StreamPage> {
     //   print(event);
     // });
 
-    var stream = Stream.periodic(Duration(seconds: 1) , (count) => count);
+    // var stream = Stream.periodic(Duration(seconds: 1) , (count) => count);
+    //
+    // var subscription = stream.listen((event) {
+    //   print(event);
+    // });
+    //
+    // Future.delayed(Duration(seconds: 5) , () => {
+    //   subscription.pause()
+    // });
+    //
+    // Future.delayed(Duration(seconds: 10) , () => {
+    //   subscription.resume()
+    // });
 
-    var subscription = stream.listen((event) {
+    StreamController controller = StreamController();
+
+    // truyền dữ liệu cho controller;
+
+    controller.sink.add(1);
+    controller.sink.add(2);
+
+    // Lắng nghe dữ liệu từ streamcontroller
+
+    var transfromer = StreamTransformer.fromHandlers(handleData: (data , sink) {
+      sink.add("Index " + data.toString());
+    });
+
+    controller.stream.transform(transfromer).listen((event) {
       print(event);
     });
 
-    Future.delayed(Duration(seconds: 5) , () => {
-      subscription.pause()
-    });
 
-    Future.delayed(Duration(seconds: 10) , () => {
-      subscription.resume()
-    });
   }
   
   @override

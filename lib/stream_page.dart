@@ -9,6 +9,9 @@ class StreamPage extends StatefulWidget {
 }
 
 class _StreamPageState extends State<StreamPage> {
+
+  StreamController controller = StreamController();
+
   @override
   void didUpdateWidget(covariant StreamPage oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -38,37 +41,64 @@ class _StreamPageState extends State<StreamPage> {
     //   subscription.resume()
     // });
 
-    StreamController controller = StreamController();
-
-    // truyền dữ liệu cho controller;
-
-    controller.sink.add(1);
-    controller.sink.add(2);
-
-    // Lắng nghe dữ liệu từ streamcontroller
-
-    var transfromer = StreamTransformer.fromHandlers(handleData: (data , sink) {
-      sink.add("Index " + data.toString());
-    });
-
-    controller.stream.transform(transfromer).listen((event) {
-      print(event);
-    });
-
+    // StreamController controller = StreamController();
+    //
+    // // truyền dữ liệu cho controller;
+    //
+    // controller.sink.add(1);
+    // controller.sink.add(2);
+    //
+    // // Lắng nghe dữ liệu từ streamcontroller
+    //
+    // var transfromer = StreamTransformer.fromHandlers(handleData: (data , sink) {
+    //   sink.add("Index " + data.toString());
+    // });
+    //
+    // controller.stream.transform(transfromer).listen((event) {
+    //   print(event);
+    // });
 
   }
   
   @override
   Widget build(BuildContext context) {
+    Future.delayed(Duration(seconds: 5) , () => {
+      controller.sink.add(5)
+    });
     return Scaffold(
       appBar: AppBar(
         title: Text("Stream Demo"),
       ),
       body: Container(
         child: Center(
-          child: Text("Demo"),
+          child: StreamBuilder(
+            stream: controller.stream,
+            builder: (context, snapshot){
+              if (snapshot.hasError){
+                return Text("Data error");
+              }
+              switch(snapshot.connectionState){
+                case ConnectionState.none :
+                  return Text("Stream lost connect or null");
+                case ConnectionState.waiting :
+                  return CircularProgressIndicator(
+                    color: Colors.blue,
+                  );
+                case ConnectionState.done :
+                  return Text("Finish");
+                case ConnectionState.active :
+                  return Text(snapshot.data.toString());
+              }
+              return Text("Default");
+            },
+          ),
         ),
       ),
     );
+  }
+  @override
+  void dispose() {
+    super.dispose();
+    controller.close();
   }
 }
